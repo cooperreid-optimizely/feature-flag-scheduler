@@ -23,8 +23,8 @@ will print out scheduled jobs and their 'job name'
 Scheduled Jobs:
 ================
 Feature ID	Toggle State	Date				Job Name
-8930855048	ENABLE		03-01-2019 17:45:38(UTC)	OPTLY_FLAG_8930855000_on
-8930855048	DISABLE		03-20-2019 17:45:38(UTC)	OPTLY_FLAG_8930855000_off
+8930855048	ENABLE		03-01-2019 17:45:00(UTC)	OPTLY_FLAG_8930855000_on
+8930855048	DISABLE		03-20-2019 17:45:00(UTC)	OPTLY_FLAG_8930855000_off
 ```
 
 #### Remove a scheduled job
