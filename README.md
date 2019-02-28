@@ -1,7 +1,7 @@
 # Feature Flag Scheduler CLI for Optimizely
 Schedule feature flag toggling using AWS Lambda &amp; CloudWatch. 
 
-Overview: Run CLI command to create a CloudWatch cron-scheduled event. When the scheduled Event is triggered, it will invoke a Lambda function and pass along the feature ID, toggle state (on/off), and environment name which will be used to toggle feature state via the Optimizely REST API.
+Overview: Run CLI command to create a CloudWatch cron-scheduled Event with a payload containing feature ID, toggle state (on/off), and environment name. When the scheduled Event is triggered, it will invoke a Lambda function and pass along the payload which will be used to toggle feature state via the Optimizely REST API.
 
 ---
 
