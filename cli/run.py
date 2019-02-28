@@ -71,9 +71,14 @@ class Scheduler():
       schedule_data.append(rule_data)
     schedule_data.sort(key=lambda item:item['dt'], reverse=True)
     print('Scheduled Jobs:\n================')
+    print('Feature ID\tToggle State\tDate\t\t\t\tJob Name')
     for job in schedule_data:
-      print('{}: {}\t{}'.format(job.get('feature'), job.get('state'), job.get('date')))
-      print('\tName: {}'.format(job.get('name')))
+      print('{}\t{}\t\t{}\t{}'.format(
+        job.get('feature'), 
+        job.get('state'), 
+        job.get('dt').strftime("%m-%d-%Y %H:%M:%S(UTC)"),
+        job.get('name'),
+      ))      
 
   def delete_job(self, name):
     """
