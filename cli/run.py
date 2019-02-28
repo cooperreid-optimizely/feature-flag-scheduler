@@ -63,6 +63,10 @@ class Scheduler():
     for rule in response.get('Rules', []):
       rule_data = {}
       description = rule.get('Description')
+      """
+      This will all break if we change the way that `description`
+      is created in `configure_rule` method
+      """
       rule_data['name']    = rule.get('Name')
       rule_data['state']   = re.search(r'\[(\w+)\]', description).group(1)
       rule_data['feature'] = re.search(r'Feature Flag: "(\d+)"', description).group(1)
