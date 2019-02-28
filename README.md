@@ -46,14 +46,14 @@ Environments:
 `>= Python 3.6`
 
 #### Setting up the local CLI
-* The AWS connectivity is handled by named profiles
+* The AWS connectivity is handled by [named profiles](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html)
 * The named profile used by the CLI must be set as an environment variable `OPTLY_LAMBDA_AWS_PROFILE`
 * The Lambda function ARN must be set as an environment variable `OPTLY_LAMBDA_FNC_ARN`
 * The Lambda function ID must be set as an environment variable `OPTLY_LAMBDA_FNC_ID`
 
 #### Setting up AWS Lambda function
 The files contents of `lambda_function/lambda_function.py` can be placed directly within a Lambda function
-* The Optimizely ["personal token"](https://developers.optimizely.com/x/rest/getting-started/) must be set as an environment variable in the Lambda function configuration screen within AWS
+* The Optimizely ["personal token"](https://developers.optimizely.com/x/rest/getting-started/) must be set as the `v2_token` environment variable in the Lambda function configuration screen within AWS
 
 #### Setting up CloudWatch Events
 Nothing needs to be done on the CloudWatch dashboard, but it helps troubleshoot by being able to refresh your list of scheduled jobs via the interface
