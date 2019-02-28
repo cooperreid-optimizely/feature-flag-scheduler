@@ -40,7 +40,11 @@ def disable_feature(feature_id, environment_key):
     return response      
 
 def lambda_handler(event, context):
-    print('Debug::: ', event, os.environ.get('v2_token'), os.environ.get('environment'), os.environ.get('feature_id'))    
+    """
+    The feature_id, state & environment will be passed in the CloudWatch Event
+    The Optimizely v2_token should be set as an environment variable in the Lambda function
+    """
+    print('Debug::: ', event, os.environ.get('v2_token'))    
     if(event.get('state', None) == 'on'):
         enable_feature(event.get('feature_id'), event.get('environment'))
     else:
