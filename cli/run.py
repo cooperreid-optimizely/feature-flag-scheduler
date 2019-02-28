@@ -15,7 +15,7 @@ class Scheduler():
   """
 
   def __init__(self):
-    session = boto3.Session(profile_name='personalevts')
+    session = boto3.Session(profile_name=os.environ.get('OPTLY_LAMBDA_AWS_PROFILE'))
     self.client  = session.client('events')
 
   def configure_rule(self, feature_id, feature_setstate, schedule_date):
