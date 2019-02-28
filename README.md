@@ -53,6 +53,7 @@ Environments:
 
 #### Setting up AWS Lambda function
 The files contents of `lambda_function/lambda_function.py` can be placed directly within a Lambda function
+* The Optimizely ["personal token"](https://developers.optimizely.com/x/rest/getting-started/) must be set as an environment variable in the Lambda function configuration screen within AWS
 
 #### Setting up CloudWatch Events
 Nothing needs to be done on the CloudWatch dashboard, but it helps troubleshoot by being able to refresh your list of scheduled jobs via the interface
