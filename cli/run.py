@@ -69,7 +69,7 @@ class Scheduler():
       rule_data['date']    = re.search(r'@ (.*)$', description).group(1)
       rule_data['dt']      = datetime.datetime.strptime(rule_data.get('date'), "%B %d, %Y, %H:%M:%S UTC")
       schedule_data.append(rule_data)
-    schedule_data.sort(key=lambda item:item['dt'], reverse=True)
+    schedule_data.sort(key=lambda item:item['dt'], reverse=False)
     print('Scheduled Jobs:\n================')
     print('Feature ID\tToggle State\tDate\t\t\t\tJob Name')
     for job in schedule_data:
