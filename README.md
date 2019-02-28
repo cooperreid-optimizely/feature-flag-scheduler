@@ -58,3 +58,4 @@ Nothing needs to be done on the CloudWatch dashboard, but it helps troubleshoot 
 ## Features To come:
 * Support for environments (right now, hardcoded to 'production')
 * Support for specifying rollout %
+* Support for relative timezones (requires UTC time currently)
