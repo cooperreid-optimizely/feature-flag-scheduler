@@ -11,12 +11,12 @@ Overview: Run CLI command to create a CloudWatch cron-scheduled Event with a pay
 
 #### Schedule for Feature Flag to be enabled on March 1, 2019 @ 5:45pm UTC
 ```bash
-$ python run.py schedule -feature 8930855000 -toggle on -date "3-1-2019 17:45:00"
+$ python run.py schedule -feature 8930855000 -toggle on -date "3-1-2019 17:45:00" -env production
 ```
 
 #### Schedule for Feature Flag to be disabled on March 20, 2019 @ 5:45pm UTC
 ```bash
-$ python run.py schedule -feature 8930855000 -toggle off -date "3-20-2019 17:45:00"
+$ python run.py schedule -feature 8930855000 -toggle off -date "3-20-2019 17:45:00" -env production
 ```
 
 #### List all scheduled feature toggle jobs
@@ -28,9 +28,9 @@ will print out scheduled jobs and their 'job name'
 ```bash
 Scheduled Jobs:
 ================
-Feature ID	Toggle State	Date				Job Name
-8930855048	ENABLE		03-01-2019 17:45:00(UTC)	OPTLY_FLAG_8930855000_on
-8930855048	DISABLE		03-20-2019 17:45:00(UTC)	OPTLY_FLAG_8930855000_off
+Feature ID	Toggle State	Date				Env		Job Name
+8930855000	DISABLE		03-20-2019 17:45:38(UTC)	production	OPTLY_FLAG_8930855000_off_production
+8930855000	ENABLE		03-1-2019 17:45:38(UTC)	production	OPTLY_FLAG_8930855000_on_production
 ```
 
 #### Remove a scheduled job
@@ -61,6 +61,5 @@ Nothing needs to be done on the CloudWatch dashboard, but it helps troubleshoot 
 ---
 
 ## Features To come:
-* Support for environments (right now, hardcoded to 'production')
 * Support for specifying rollout %
 * Support for relative timezones (requires UTC time currently)
