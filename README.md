@@ -39,6 +39,11 @@ Feature ID	Toggle State	Date				Env		Job Name
 $ python run.py delete -job OPTLY_FLAG_8930855000_on_production
 ```
 
+#### Toggle a flag on-demand (not scheduled)
+```bash
+$ python run.py flag -toggle on -feature 8930855000 -env stage
+```
+
 ---
 
 ## Configuration
