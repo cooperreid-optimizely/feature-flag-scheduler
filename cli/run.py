@@ -79,8 +79,9 @@ class Scheduler():
       rule_data = {}
       description = rule.get('Description')
       """
-      This will all break if we change the way that `description`
-      is created in `configure_rule` method
+      This will all break if we change the way that `description` in the `configure_rule` method.
+      May want to rethin how this metadata is store. Didn't want to have to fetch all rules then targets
+      in order to print this list      
       """
       rule_data['name']    = rule.get('Name')
       rule_data['state']   = re.search(r'^\[(\w+)\]', description).group(1)
