@@ -66,6 +66,6 @@ Nothing needs to be done on the CloudWatch dashboard, but it helps troubleshoot 
 
 ---
 
-## Features To come:
+## Missing features:
 * Support for specifying rollout %
 * Support for relative timezones (requires UTC time currently)
