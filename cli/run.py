@@ -15,8 +15,21 @@ class Scheduler():
   """
 
   def __init__(self):
-    session = boto3.Session(profile_name=os.environ.get('OPTLY_LAMBDA_AWS_PROFILE'))
-    self.client  = session.client('events')
+    self.session = boto3.Session(profile_name=os.environ.get('OPTLY_LAMBDA_AWS_PROFILE'))
+    self.client  = self.session.client('events')
+
+  def invoke_lambda_directly(self, feature_id, environment, feature_setstate):
+    lambda_client = self.session.client('lambda')    
+    response = lambda_client.invoke(
+      FunctionName=os.environ.get('OPTLY_LAMBDA_FNC_ARN'), # can be ARN
+      InvocationType='Event',
+      Payload=json.dumps({
+        'feature_id': feature_id,
+        'environment': 'production',
+        'state': feature_setstate,
+      })
+    )
+    return response
 
   def configure_rule(self, feature_id, feature_setstate, schedule_date):
     cron_schedule_datetime = get_expression(schedule_date)
@@ -113,18 +126,22 @@ if __name__ == '__main__':
   parser.add_argument('action')
   parser.add_argument('-feature', help='Feature ID', action="store", dest="feature")
   parser.add_argument('-toggle',  help='Set Feature State', action="store", dest="toggle", choices=['on', 'off'])
+  parser.add_argument('-env',  help='Environment to toggle feature', action="store", dest="env")
   parser.add_argument('-job',  help='Specific Job Name when deleting', action="store", dest="job_name")  
   parser.add_argument('-date',  help='Schedule date', action="store", dest="date")  
   args = parser.parse_args()
 
-  if args.action == 'schedule':
+  if args.action in ['schedule', 'flag']:
     if not args.feature:
-      print('-feature [ID] required when action is "enable" or "disable"')
+      print('-feature [ID] required when action is "enable", "disable" or "flag"')
       exit()
     if not args.toggle:
-      print('-toggle ["on", "off"] required when action is "enable" or "disable"')    
+      print('-toggle ["on", "off"] required when action is "enable", "disable" or "flag"')
       exit()
-    if not args.date:
+    # if not args.env:
+    #   print('-env [ENV NAME] required when action is "enable", "disable" or "flag"')    
+    #   exit()      
+    if args.action == 'schedule' and not args.date:
       print('-date required with format "%m-%d-%Y %H:%M:%S", e.g.: "3-23-2019 17:45:38"')
       exit()
   if args.action == 'delete' and not args.job_name:
@@ -138,6 +155,9 @@ if __name__ == '__main__':
     scheduler.schedule_feature_toggle(args.feature, args.toggle, args.date)
   elif args.action == 'delete':
     scheduler = Scheduler()
-    scheduler.delete_job(args.job_name)  
+    scheduler.delete_job(args.job_name) 
+  elif args.action == 'flag':
+    scheduler = Scheduler()
+    scheduler.invoke_lambda_directly(args.feature, 'production', args.toggle)
   else:
     parser.print_help()
