@@ -36,7 +36,7 @@ Feature ID	Toggle State	Date				Env		Job Name
 
 #### Remove a scheduled job
 ```bash
-$ python run.py delete -job OPTLY_FLAG_8930855000_on
+$ python run.py delete -job OPTLY_FLAG_8930855000_on_production
 ```
 
 ---
