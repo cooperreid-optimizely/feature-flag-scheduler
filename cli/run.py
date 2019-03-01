@@ -25,17 +25,17 @@ class Scheduler():
       InvocationType='Event',
       Payload=json.dumps({
         'feature_id': feature_id,
-        'environment': 'production',
+        'environment': environment,
         'state': feature_setstate,
       })
     )
     return response
 
-  def configure_rule(self, feature_id, feature_setstate, schedule_date):
+  def configure_rule(self, environment, feature_id, feature_setstate, schedule_date):
     cron_schedule_datetime = get_expression(schedule_date)
     cron_expression        = cron_schedule_datetime.get('cron')
     cron_readable          = cron_schedule_datetime.get('human')
-    rule_name              = '{}_{}_{}'.format(RULE_NAME_PREFIX, feature_id, feature_setstate)
+    rule_name              = '{}_{}_{}_{}'.format(RULE_NAME_PREFIX, feature_id, feature_setstate, environment)
     
     """
     Create an event that runs on a cron schedule
@@ -44,15 +44,17 @@ class Scheduler():
       Name=rule_name,
       ScheduleExpression='cron({})'.format(cron_expression),
       State='ENABLED',
-      Description='[{}] Optimizely Feature Flag: "{}" @ {}'.format(
+      Description='[{}] Optimizely Feature Flag: "{}" @ {} [{}]'.format(
         'ENABLE' if feature_setstate == 'on' else 'DISABLE', 
         feature_id, 
-        cron_readable),
+        cron_readable,
+        environment,
+      ),
     )
 
     return rule_name
 
-  def configure_target(self, rule_name, feature_id, feature_setstate):
+  def configure_target(self, rule_name, environment, feature_id, feature_setstate):
     """
     Add a target to our Rule
     """
@@ -64,7 +66,7 @@ class Scheduler():
           'Arn': os.environ.get('OPTLY_LAMBDA_FNC_ARN'),
           'Input': json.dumps({
             'feature_id': feature_id,
-            'environment': 'production',
+            'environment': environment,
             'state': feature_setstate,
           }),
         }
@@ -81,19 +83,21 @@ class Scheduler():
       is created in `configure_rule` method
       """
       rule_data['name']    = rule.get('Name')
-      rule_data['state']   = re.search(r'\[(\w+)\]', description).group(1)
+      rule_data['state']   = re.search(r'^\[(\w+)\]', description).group(1)
       rule_data['feature'] = re.search(r'Feature Flag: "(\d+)"', description).group(1)
-      rule_data['date']    = re.search(r'@ (.*)$', description).group(1)
+      rule_data['date']    = re.search(r'@ (.*) \[', description).group(1)
+      rule_data['env']     = re.search(r'\[(\w+)\]$', description).group(1)
       rule_data['dt']      = datetime.datetime.strptime(rule_data.get('date'), "%B %d, %Y, %H:%M:%S UTC")
       schedule_data.append(rule_data)
     schedule_data.sort(key=lambda item:item['dt'], reverse=False)
     print('Scheduled Jobs:\n================')
-    print('Feature ID\tToggle State\tDate\t\t\t\tJob Name')
+    print('Feature ID\tToggle State\tDate\t\t\t\tEnv\t\tJob Name')
     for job in schedule_data:
-      print('{}\t{}\t\t{}\t{}'.format(
+      print('{}\t{}\t\t{}\t{}\t{}'.format(
         job.get('feature'), 
         job.get('state'), 
         job.get('dt').strftime("%m-%d-%Y %H:%M:%S(UTC)"),
+        job.get('env'),
         job.get('name'),
       ))      
 
@@ -113,9 +117,9 @@ class Scheduler():
     delete_rule = self.client.delete_rule(Name=name,Force=True)
     return delete_rule
 
-  def schedule_feature_toggle(self, feature_id, feature_setstate, schedule_date):
-    rule_name = self.configure_rule(feature_id, feature_setstate, schedule_date)
-    self.configure_target(rule_name, feature_id, feature_setstate)
+  def schedule_feature_toggle(self, feature_id, environment, feature_setstate, schedule_date):
+    rule_name = self.configure_rule(environment, feature_id, feature_setstate, schedule_date)
+    self.configure_target(rule_name, environment, feature_id, feature_setstate)
 
   def parse_all_jobs(self):
     response = self.client.list_rules(NamePrefix=RULE_NAME_PREFIX)
@@ -138,9 +142,9 @@ if __name__ == '__main__':
     if not args.toggle:
       print('-toggle ["on", "off"] required when action is "enable", "disable" or "flag"')
       exit()
-    # if not args.env:
-    #   print('-env [ENV NAME] required when action is "enable", "disable" or "flag"')    
-    #   exit()      
+    if not args.env:
+      print('-env [ENV NAME] required when action is "enable", "disable" or "flag"')    
+      exit()      
     if args.action == 'schedule' and not args.date:
       print('-date required with format "%m-%d-%Y %H:%M:%S", e.g.: "3-23-2019 17:45:38"')
       exit()
@@ -152,12 +156,12 @@ if __name__ == '__main__':
     scheduler.list_jobs()
   elif args.action == 'schedule':
     scheduler = Scheduler()
-    scheduler.schedule_feature_toggle(args.feature, args.toggle, args.date)
+    scheduler.schedule_feature_toggle(args.feature, args.env, args.toggle, args.date)
   elif args.action == 'delete':
     scheduler = Scheduler()
     scheduler.delete_job(args.job_name) 
   elif args.action == 'flag':
     scheduler = Scheduler()
-    scheduler.invoke_lambda_directly(args.feature, 'production', args.toggle)
+    scheduler.invoke_lambda_directly(args.feature, args.env, args.toggle)
   else:
     parser.print_help()
